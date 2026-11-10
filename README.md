@@ -24,19 +24,7 @@
 
 ## 실행 방법
 
-Node.js 20 이상을 권장합니다.
-
-```bash
-pnpm install
-pnpm dev
-```
-
-프로덕션 빌드:
-
-```bash
-pnpm build
-pnpm preview
-```
+http://localhost:5173/
 
 ## 기술 스택
 
