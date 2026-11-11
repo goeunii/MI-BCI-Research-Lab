@@ -27,6 +27,7 @@ import {
 } from 'lucide-react'
 
 const participants = ['KGE', 'KHY', 'OYJ', 'WMJ']
+const brainImage = `${import.meta.env.BASE_URL}brain-hero.png`
 
 const researchData = {
   A: {
@@ -171,7 +172,7 @@ function App() {
             </div>
             <div className="hero-brain">
               <span className="orbit orbit-1" /><span className="orbit orbit-2" /><span className="orbit orbit-3" />
-              <img src="/brain-hero.png" alt="운동 피질 전극과 신호 연결을 표현한 파란색 뇌 시각화" />
+              <img src={brainImage} alt="운동 피질 전극과 신호 연결을 표현한 파란색 뇌 시각화" />
               <span className="brain-tag tag-c3"><i /> C3</span>
               <span className="brain-tag tag-cz"><i /> Cz</span>
               <span className="brain-tag tag-c4"><i /> C4</span>
@@ -324,7 +325,7 @@ function App() {
               <div className="wearable-iot-panel">
                 <div className="mannequin-side">
                   <div className="mannequin-head">
-                    <img src="/brain-hero.png" alt="저채널 웨어러블을 착용한 뇌 마네킹" />
+                    <img src={brainImage} alt="저채널 웨어러블을 착용한 뇌 마네킹" />
                     <i className="mannequin-band" />
                     {['C3', 'Cz', 'C4', 'P3', 'P4'].map((name, index) => <span className={`mannequin-node node-${index + 1}`} key={name}><i />{name}</span>)}
                     <b><Radio /> 5 CH 웨어러블</b>
@@ -346,7 +347,7 @@ function App() {
               <article className="game-card game-tab-panel">
                 <div className="demo-heading"><span>02</span><div><small>좌·우 제어 미니게임</small><h3>떨어지는 물체 피하기</h3></div></div>
                 <div className={gameRunning ? 'mini-game running' : 'mini-game'}>
-                  <div className="game-brain"><img src="/brain-hero.png" alt="전극이 표시된 뇌 모형" /><i className={gameSide === 'right' ? 'hot left' : gameSide === 'left' ? 'hot right' : ''} /><span>{gameSide === 'left' ? 'C4 자극점 · 왼쪽 이동' : gameSide === 'right' ? 'C3 자극점 · 오른쪽 이동' : '좌·우를 선택하세요'}</span></div>
+                  <div className="game-brain"><img src={brainImage} alt="전극이 표시된 뇌 모형" /><i className={gameSide === 'right' ? 'hot left' : gameSide === 'left' ? 'hot right' : ''} /><span>{gameSide === 'left' ? 'C4 자극점 · 왼쪽 이동' : gameSide === 'right' ? 'C3 자극점 · 오른쪽 이동' : '좌·우를 선택하세요'}</span></div>
                   <div className="game-stage">
                     <i className="falling item-1" /><i className="falling item-2" /><i className="falling item-3" />
                     <span className={`game-character ${gameSide}`}><Gamepad2 /></span>
