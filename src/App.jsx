@@ -10,13 +10,11 @@ import {
   CircleDot,
   Database,
   Gamepad2,
-  Fan,
   Lightbulb,
   Menu,
   MoveLeft,
   MoveRight,
   Pause,
-  Power,
   Play,
   Radio,
   RotateCcw,
@@ -32,22 +30,22 @@ const participants = ['KGE', 'KHY', 'OYJ', 'WMJ']
 
 const researchData = {
   A: {
-    label: '연구 A',
-    title: '저채널 최적화 및 신호 안정화',
-    summary: '분류에 필요한 핵심 전극을 찾고, 세션이 달라져도 사용할 수 있는 안정적인 신호 표현을 연구합니다.',
-    question: '전극 수를 줄이면서도 운동상상 분류 정보를 유지할 수 있을까?',
-    chips: ['16채널 → 5·7채널', '신호 품질 관리', '공분산 안정화', '영점 보정'],
+    label: '공간적 제약',
+    title: '저채널·영점 보정',
+    summary: '많은 전극이 필요한 공간적 제약을 줄이기 위해 핵심 채널을 선택하고, 영점 보정으로 신호 기준을 안정화합니다.',
+    question: '적은 전극으로도 안정적인 운동상상 분류가 가능할까?',
+    chips: ['16채널 → 5·7채널', '핵심 채널 선택', '영점 보정', '신호 안정화'],
     steps: [
       ['01', '기준 신호 구성', '16채널 EEG를 기준으로 신호 품질과 세션별 변화를 확인합니다.'],
       ['02', '핵심 채널 탐색', '운동상상 분류에 필요한 전극 조합을 같은 평가 조건에서 비교합니다.'],
-      ['03', '신호 안정화', '세션 간 분포 변화에 대응하는 보정 방법을 적용하고 검증합니다.'],
+      ['03', '영점 보정', '신호의 기준점을 보정해 저채널 환경에서도 안정적인 분류를 검증합니다.'],
     ],
   },
   B: {
-    label: '연구 B',
-    title: 'TTT 기반 테스트 시점 적응',
-    summary: '학습된 모델을 고정해 사용하는 대신, 새 테스트 세션의 특성을 이용해 추론 시점에 적응하는 방법을 연구합니다.',
-    question: '모델이 처음 보는 EEG 세션에 테스트 과정에서 적응할 수 있을까?',
+    label: '시간적 제약',
+    title: 'TTT 기반 시간 변화 적응',
+    summary: '시간이 지나 EEG 분포가 변하는 제약을 줄이기 위해 새 테스트 세션의 특성을 이용해 추론 시점에 모델을 적응시킵니다.',
+    question: '시간이 지나 세션이 달라져도 분류 성능을 유지할 수 있을까?',
     chips: ['EEGNet', 'EEG Conformer', 'TTT OFF / ON', '세션 변화 대응'],
     steps: [
       ['01', '기준 모델 학습', '학습 세션으로 EEGNet과 EEG Conformer 기준 모델을 구성합니다.'],
@@ -144,6 +142,7 @@ function App() {
   const [channels, setChannels] = useState(7)
   const [playing, setPlaying] = useState(false)
   const [iot, setIot] = useState({ light: false, blind: false, fan: false })
+  const [activeDemo, setActiveDemo] = useState('iot')
   const [gameSide, setGameSide] = useState('center')
   const [gameRunning, setGameRunning] = useState(false)
   const [score, setScore] = useState(0)
@@ -164,7 +163,7 @@ function App() {
             <div className="hero-copy">
               <p className="eyebrow"><span /> 운동상상 기반 뇌-컴퓨터 인터페이스 연구</p>
               <h1>더 적은 전극으로,<br /><em>더 안정적인</em><br />뇌파 분류</h1>
-              <p className="hero-description">운동상상 EEG의 핵심 채널을 찾고, 세션 변화에 대응하는 신호 안정화와 테스트 시점 적응 방법을 연구합니다.</p>
+              <p className="hero-description">공간적 제약은 저채널·영점 보정으로, 시간적 제약은 TTT 적응으로 줄여 실제 사용 가능한 운동상상 BCI를 연구합니다.</p>
               <div className="hero-actions">
                 <a className="button primary" href="#research">연구 내용 보기 <ArrowDown /></a>
                 <a className="button secondary" href="#application">체험 영역 보기 <ArrowRight /></a>
@@ -180,7 +179,7 @@ function App() {
             </div>
           </div>
           <div className="container hero-summary">
-            <div><small>연구 구성</small><b>2개 연구 방향</b><span>저채널 안정화 · TTT 적응</span></div>
+            <div><small>연구 구성</small><b>시공간 제약 대응</b><span>공간: 저채널 · 시간: TTT</span></div>
             <div><small>채널 비교</small><b>16 → 5·7채널</b><span>전체 채널과 저채널 구성 비교</span></div>
             <div><small>참가자</small><b>4명</b><span>KGE · KHY · OYJ · WMJ</span></div>
           </div>
@@ -211,7 +210,7 @@ function App() {
 
         <section className="section blue-section" id="research">
           <div className="container">
-            <SectionTitle light number="02" label="연구 내용" title={<>하나의 목표를 향한<br />두 가지 연구 방향</>} description="연구 A와 B는 평가 목적과 조건이 다르기 때문에 각각 독립적으로 설명하고 비교합니다." />
+            <SectionTitle light number="02" label="연구 내용" title={<>시공간적 제약을 줄이기 위한<br />두 가지 연구</>} description="공간적 제약은 저채널·영점 보정으로, 시간적 제약은 TTT로 해결합니다. 탭을 누르면 각 연구 과정을 자세히 확인할 수 있습니다." />
             <div className="research-tabs" role="tablist" aria-label="연구 선택">
               {Object.entries(researchData).map(([key, item]) => (
                 <button key={key} className={activeResearch === key ? 'active' : ''} onClick={() => setActiveResearch(key)} role="tab" aria-selected={activeResearch === key}>
@@ -316,31 +315,38 @@ function App() {
         <section className="section white-section applications">
           <div className="container">
             <SectionTitle number="06" label="확장 방향" title={<>뇌파 분류 결과를<br />기기와 게임 제어로 연결</>} description="아래 기능은 연구 결과의 활용 가능성을 보여주는 화면 시뮬레이션이며, 실제 IoT 기기나 실시간 EEG와 연결된 상태는 아닙니다." />
-            <div className="expansion-grid">
-              <article className="wearable-card">
-                <div className="demo-heading"><span>01</span><div><small>저채널 웨어러블</small><h3>전극 위치 확인</h3></div></div>
-                <div className="wearable-head">
-                  <i className="wearable-band" />
-                  {['C3', 'Cz', 'C4', 'P3', 'P4'].map((name, index) => <span className={`wearable-dot dot-${index + 1}`} key={name}><i />{name}</span>)}
-                  <b><Radio /> 5 CH</b>
-                </div>
-                <p>운동 피질 주변의 핵심 전극을 가벼운 착용 구조에 배치한 콘셉트입니다.</p>
-              </article>
+            <div className="demo-tabs" role="tablist" aria-label="응용 시뮬레이션 선택">
+              <button className={activeDemo === 'iot' ? 'active' : ''} onClick={() => setActiveDemo('iot')} role="tab" aria-selected={activeDemo === 'iot'}><Radio />웨어러블 IoT</button>
+              <button className={activeDemo === 'game' ? 'active' : ''} onClick={() => setActiveDemo('game')} role="tab" aria-selected={activeDemo === 'game'}><Gamepad2 />미니게임</button>
+            </div>
 
-              <article className="iot-card">
-                <div className="demo-heading"><span>02</span><div><small>IoT 제어 시뮬레이션</small><h3>생활 기기 켜고 끄기</h3></div></div>
-                <div className="iot-room">
-                  <button className={iot.light ? 'on' : ''} onClick={() => setIot({ ...iot, light: !iot.light })}><Lightbulb /><span>조명</span><b>{iot.light ? 'ON' : 'OFF'}</b></button>
-                  <button className={iot.blind ? 'on' : ''} onClick={() => setIot({ ...iot, blind: !iot.blind })}><SlidersHorizontal /><span>블라인드</span><b>{iot.blind ? 'OPEN' : 'CLOSE'}</b></button>
-                  <button className={iot.fan ? 'on' : ''} onClick={() => setIot({ ...iot, fan: !iot.fan })}><Fan /><span>공기 순환</span><b>{iot.fan ? 'ON' : 'OFF'}</b></button>
+            {activeDemo === 'iot' ? (
+              <div className="wearable-iot-panel">
+                <div className="mannequin-side">
+                  <div className="mannequin-head">
+                    <img src="/brain-hero.png" alt="저채널 웨어러블을 착용한 뇌 마네킹" />
+                    <i className="mannequin-band" />
+                    {['C3', 'Cz', 'C4', 'P3', 'P4'].map((name, index) => <span className={`mannequin-node node-${index + 1}`} key={name}><i />{name}</span>)}
+                    <b><Radio /> 5 CH 웨어러블</b>
+                  </div>
+                  <p>뇌 마네킹에 저채널 전극 위치를 표시한 착용 콘셉트</p>
                 </div>
-                <p><Power /> 버튼을 눌러 분류 명령이 기기 상태로 연결되는 흐름을 확인합니다.</p>
-              </article>
-
-              <article className="game-card">
-                <div className="demo-heading"><span>03</span><div><small>좌·우 제어 미니게임</small><h3>떨어지는 물체 피하기</h3></div></div>
+                <ArrowRight className="demo-flow-arrow" />
+                <div className={iot.light ? 'light-control on' : 'light-control'}>
+                  <div className="lamp-visual"><Lightbulb /><span /></div>
+                  <small>IoT 조명 상태</small><h3>{iot.light ? 'ON' : 'OFF'}</h3>
+                  <p>{iot.light ? '왼쪽 운동상상 명령이 감지되었습니다.' : '오른쪽 운동상상 명령이 감지되었습니다.'}</p>
+                  <div className="imagine-controls">
+                    <button className={iot.light ? 'active' : ''} onClick={() => setIot({ ...iot, light: true })}><span>C4</span>왼쪽 상상 → ON</button>
+                    <button className={!iot.light ? 'active' : ''} onClick={() => setIot({ ...iot, light: false })}><span>C3</span>오른쪽 상상 → OFF</button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <article className="game-card game-tab-panel">
+                <div className="demo-heading"><span>02</span><div><small>좌·우 제어 미니게임</small><h3>떨어지는 물체 피하기</h3></div></div>
                 <div className={gameRunning ? 'mini-game running' : 'mini-game'}>
-                  <div className="game-brain"><BrainCircuit /><i className={gameSide === 'right' ? 'hot left' : gameSide === 'left' ? 'hot right' : ''} /><span>{gameSide === 'left' ? 'C4 자극점' : gameSide === 'right' ? 'C3 자극점' : '좌·우를 선택하세요'}</span></div>
+                  <div className="game-brain"><img src="/brain-hero.png" alt="전극이 표시된 뇌 모형" /><i className={gameSide === 'right' ? 'hot left' : gameSide === 'left' ? 'hot right' : ''} /><span>{gameSide === 'left' ? 'C4 자극점 · 왼쪽 이동' : gameSide === 'right' ? 'C3 자극점 · 오른쪽 이동' : '좌·우를 선택하세요'}</span></div>
                   <div className="game-stage">
                     <i className="falling item-1" /><i className="falling item-2" /><i className="falling item-3" />
                     <span className={`game-character ${gameSide}`}><Gamepad2 /></span>
@@ -354,7 +360,7 @@ function App() {
                   <button className="reset" onClick={() => { setGameSide('center'); setScore(0); setGameRunning(false) }} aria-label="게임 초기화"><RotateCcw /></button>
                 </div>
               </article>
-            </div>
+            )}
           </div>
         </section>
 
